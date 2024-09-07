@@ -1,0 +1,10 @@
+FROM arm64v8/golang:alpine as builder
+
+RUN apk add --no-cache git
+RUN go install filippo.io/mkcert@latest
+
+FROM arm64v8/alpine:latest
+
+COPY --from=builder /go/bin/mkcert /usr/local/bin/mkcert
+
+ENTRYPOINT ["mkcert"]

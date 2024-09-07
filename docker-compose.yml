@@ -122,16 +122,18 @@ services:
 
   # Automatically create self-signed certificates for local development and test deployments
   mkcert:
-    image: arm64v8/alpine
+    build:
+      context: ./docker-mkcert
+      dockerfile: Dockerfile.arm64
     environment:
       domain: ${QFIELDCLOUD_HOST}
     volumes:
       - ./conf/nginx/certs/:/root/.local/share/mkcert/
-    command: /bin/sh -c 'mkcert -install && for i in $$(echo $$domain | sed "s/,/ /g"); do [ ! -f /root/.local/share/mkcert/$$i.pem ] && mkcert $$i; done && tail -f -n0 /etc/hosts'
 
   certbot:
-    image: certbot/certbot:arm64v8
-    restart: unless-stopped
+    build:
+      context: ./docker-certbot
+      dockerfile: Dockerfile.arm64
     volumes:
       - ./conf/certbot/conf:/etc/letsencrypt
       - certbot_www:/var/www/certbot
@@ -172,7 +174,8 @@ services:
     stop_grace_period: 15m
 
   ofelia:
-    image: mcuadros/ofelia:v0.3.4-arm64v8
+    image: mcuadros/ofelia:latest
+    platform: linux/arm64
     restart: unless-stopped
     depends_on:
       - app
@@ -181,17 +184,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   mirror_transformation_grids:
-    image: arm64v8/alpine
+    image: arm64v8/alpine:latest
     command: |
       wget --mirror https://cdn.proj.org/ -P /transformation_grids --no-host-directories
       chmod a+r /transformation_grids/*
     volumes:
       - transformation_grids:/transformation_grids
-
+  
   memcached:
     image: arm64v8/memcached:1
-    expose:
-      - "11211:11211"
 
 volumes:
   static_volume:
