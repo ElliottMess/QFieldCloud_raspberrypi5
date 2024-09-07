@@ -199,6 +199,8 @@ services:
     logging: *default-logging
     scale: ${QFIELDCLOUD_WORKER_REPLICAS}
     stop_grace_period: 15m
+    ports:
+      - "${DEBUG_DEBUGPY_WORKER_WRAPPER_PORT:-5680}:5679"
 
   ofelia:
     image: mcuadros/ofelia:latest
