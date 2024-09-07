@@ -232,10 +232,10 @@ services:
       - "${MINIO_BROWSER_PORT:-8013}:9001"
 
 volumes:
+  geodb_data:
   static_volume:
   media_volume:
   transformation_grids:
   certbot_www:
   postgres_data:
-  geodb_data:
   smtp4dev_data:
