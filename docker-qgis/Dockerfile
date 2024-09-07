@@ -25,7 +25,8 @@ RUN apt-get update && apt-get upgrade -y && \
     python3-pyqt5.qsci python3-pyqt5.qtsvg python3-pyqt5.qtwebkit \
     libexiv2-dev libzip-dev \
     libspatialindex-dev python3-dev python3-pip \
-    libpython3-dev python3-setuptools
+    libpython3-dev python3-setuptools \
+    libprotobuf-dev protobuf-compiler
 
 # Clone QGIS
 RUN git clone --depth 1 --branch release-3_28 https://github.com/qgis/QGIS.git /tmp/QGIS
@@ -42,11 +43,12 @@ RUN cd /tmp/QGIS && \
         -DWITH_CUSTOM_WIDGETS=OFF \
         -DWITH_BINDINGS=OFF \
         -DWITH_GRASS=OFF \
-        -DWITH_GRASS7=OFF && \
+        -DWITH_GRASS7=OFF \
+        -DWITH_PROTOBUF=ON && \
     make -j$(nproc) && \
     make install && \
     ldconfig
-    
+
 # Install QGIS Python bindings
 RUN pip3 install --no-cache-dir PyQGIS
 
