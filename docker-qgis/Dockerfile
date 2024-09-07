@@ -2,63 +2,64 @@ ARG ARCH=arm64v8
 FROM ${ARCH}/ubuntu:noble
 
 # Install dependencies
-RUN apt update && apt upgrade -y && apt install -y \
+RUN apt-get update && apt-get upgrade -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
     gnupg software-properties-common wget \
     python3-pip xvfb iputils-ping glibc-tools git \
-    build-essential cmake libqt5core5a libqt5gui5 libqt5network5 \
-    libqt5widgets5 libqt5xml5 libgdal-dev libgeos-dev libproj-dev \
-    libspatialite-dev libspatialindex-dev libsqlite3-dev
+    build-essential cmake \
+    libqt5core5a libqt5gui5 libqt5network5 \
+    libqt5widgets5 libqt5xml5 \
+    libgdal-dev libgeos-dev libproj-dev \
+    libspatialite-dev libspatialindex-dev libsqlite3-dev \
+    flex bison \
+    libexpat1-dev libfcgi-dev \
+    libgsl-dev libpq-dev libqca-qt5-2-dev \
+    libqca-qt5-2-plugins qtbase5-dev \
+    qttools5-dev qttools5-dev-tools \
+    qtpositioning5-dev libqt5svg5-dev \
+    libqt5serialport5-dev qtlocation5-dev \
+    qt3d5-dev libqt5opengl5-dev \
+    libqwt-qt5-dev libqt5scintilla2-dev \
+    libqca-qt5-2-dev libqt5xmlpatterns5-dev \
+    pyqt5-dev pyqt5-dev-tools python3-pyqt5 \
+    python3-pyqt5.qsci python3-pyqt5.qtsvg python3-pyqt5.qtwebkit \
+    libexiv2-dev libzip-dev \
+    libspatialindex-dev python3-dev python3-pip \
+    libpython3-dev python3-setuptools
 
-# Build QGIS from source (this may take a while)
-RUN git clone https://github.com/qgis/QGIS.git /tmp/QGIS \
-    && cd /tmp/QGIS \
-    && mkdir build && cd build \
-    && cmake .. \
-    && make -j$(nproc) \
-    && make install
-    
-# Add QGIS GPG key
-RUN wget -O /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg
+# Clone QGIS
+RUN git clone --depth 1 --branch release-3_28 https://github.com/qgis/QGIS.git /tmp/QGIS
 
-# Add QGIS repository
-RUN echo "Types: deb deb-src\n\
-URIs: https://qgis.org/debian\n\
-Suites: noble\n\
-Architectures: amd64\n\
-Components: main\n\
-Signed-By: /etc/apt/keyrings/qgis-archive-keyring.gpg\n" > /etc/apt/sources.list.d/qgis.sources
+# Build QGIS
+RUN cd /tmp/QGIS && \
+    mkdir build && \
+    cd build && \
+    cmake .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DWITH_GUI=OFF \
+        -DWITH_DESKTOP=OFF \
+        -DWITH_SERVER=OFF \
+        -DWITH_CUSTOM_WIDGETS=OFF \
+        -DWITH_BINDINGS=OFF \
+        -DWITH_ANALYSIS=OFF \
+        -DWITH_GRASS=OFF \
+        -DWITH_GRASS7=OFF && \
+    make -j$(nproc) && \
+    make install && \
+    ldconfig
 
-# Install non-QGIS dependencies
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y \
-    python3-pip \
-    xvfb \
-    iputils-ping \
-    glibc-tools \
-    git
+# Install QGIS Python bindings
+RUN pip3 install --no-cache-dir PyQGIS
 
-# Set QGIS version as in the debian repos
-# Choose your version from here: https://debian.qgis.org/debian/dists/noble/main/binary-amd64/Packages
-ARG QGIS_VERSION=1:3.38.1+40noble
+# Clean up
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install QGIS dependencies
-RUN apt update \
-    && apt upgrade -y \
-    # NOTE `DEBIAN_FRONTEND=noninteractive` is required to be able to install tzinfo
-    && DEBIAN_FRONTEND=noninteractive apt install -yf \
-        qgis=${QGIS_VERSION} \
-        qgis-dbg=${QGIS_VERSION} \
-        qgis-common=${QGIS_VERSION} \
-        python3-qgis=${QGIS_VERSION} \
-        python3-qgis-common=${QGIS_VERSION} \
-        qgis-providers=${QGIS_VERSION} \
-        qgis-providers-common=${QGIS_VERSION} \
-    && apt clean
-
-# If debug build, install `gdbserver`
-ARG DEBUG_BUILD
-RUN if [ "$DEBUG_BUILD" = "1" ]; then apt install -y gdbserver valgrind; fi
+# Set environment variables
+ENV LANG=C.UTF-8
+ENV QT_QPA_PLATFORM=offscreen
+ENV QGIS_PREFIX_PATH=/usr/local
+ENV PYTHONPATH=${QGIS_PREFIX_PATH}/share/qgis/python:${PYTHONPATH}
 
 WORKDIR /usr/src/app
 
@@ -87,3 +88,4 @@ COPY qfc_worker qfc_worker
 COPY entrypoint.py .
 
 ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run -a \"$@\"", ""]
+CMD ["python3"]
