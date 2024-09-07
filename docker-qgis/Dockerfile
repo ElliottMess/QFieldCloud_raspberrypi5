@@ -41,13 +41,12 @@ RUN cd /tmp/QGIS && \
         -DWITH_SERVER=OFF \
         -DWITH_CUSTOM_WIDGETS=OFF \
         -DWITH_BINDINGS=OFF \
-        -DWITH_ANALYSIS=OFF \
         -DWITH_GRASS=OFF \
         -DWITH_GRASS7=OFF && \
     make -j$(nproc) && \
     make install && \
     ldconfig
-
+    
 # Install QGIS Python bindings
 RUN pip3 install --no-cache-dir PyQGIS
 
