@@ -191,9 +191,6 @@ services:
     volumes:
       - transformation_grids:/transformation_grids
   
-  memcached:
-    image: arm64v8/memcached:1
-
   db:
     image: arm64v8/postgres:13
     environment:
@@ -217,12 +214,18 @@ services:
     ports:
       - "${SMTP4DEV_WEB_PORT:-8013}:80"
       - "${SMTP4DEV_SMTP_PORT:-25}:25"
-      - "${SMTP4DEV_IMAP_PORT:-143}:143"
+      - "${SMTP4DEV_IMAP_PORT:-1143}:143"
     volumes:
       - smtp4dev_data:/smtp4dev
+
+  memcached:
+    image: arm64v8/memcached:1
 
 volumes:
   static_volume:
   media_volume:
   transformation_grids:
   certbot_www:
+  postgres_data:
+  geodb_data:
+  smtp4dev_data:
