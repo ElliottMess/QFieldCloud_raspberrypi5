@@ -20,8 +20,7 @@ services:
   geodb:
     build:
       context: ./postgis
-      dockerfile: Dockerfile.postgis
-    platform: linux/arm64/v8
+      dockerfile: Dockerfile
     environment:
       POSTGRES_USER: ${GEODB_USER}
       POSTGRES_PASSWORD: ${GEODB_PASSWORD}
