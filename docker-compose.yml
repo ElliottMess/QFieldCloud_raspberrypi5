@@ -223,6 +223,11 @@ services:
   memcached:
     image: arm64v8/memcached:1
 
+  minio:
+    ports:
+      - "${MINIO_API_PORT:-8009}:9000"
+      - "${MINIO_BROWSER_PORT:-8011}:9001"
+
 volumes:
   static_volume:
   media_volume:
