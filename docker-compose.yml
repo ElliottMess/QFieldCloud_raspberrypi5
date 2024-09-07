@@ -7,6 +7,33 @@ x-logging: &default-logging
     tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
 
 services:
+  db:
+    image: arm64v8/postgres:13
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  geodb:
+    image: postgis/postgis:13-3.1-arm64v8
+    environment:
+      POSTGRES_USER: ${GEODB_USER}
+      POSTGRES_PASSWORD: ${GEODB_PASSWORD}
+      POSTGRES_DB: ${GEODB_DB}
+    volumes:
+      - geodb_data:/var/lib/postgresql/data
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    ports:
+      - "${SMTP4DEV_WEB_PORT:-8013}:80"
+      - "${SMTP4DEV_SMTP_PORT:-2525}:25"
+      - "${SMTP4DEV_IMAP_PORT:-1143}:143"
+    volumes:
+      - smtp4dev_data:/smtp4dev
+
   app: &default-django
     build:
       context: ./docker-app
@@ -190,33 +217,6 @@ services:
       chmod a+r /transformation_grids/*
     volumes:
       - transformation_grids:/transformation_grids
-  
-  db:
-    image: arm64v8/postgres:13
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  geodb:
-    image: postgis/postgis:13-3.1-arm64v8
-    environment:
-      POSTGRES_USER: ${GEODB_USER}
-      POSTGRES_PASSWORD: ${GEODB_PASSWORD}
-      POSTGRES_DB: ${GEODB_DB}
-    volumes:
-      - geodb_data:/var/lib/postgresql/data
-
-  smtp4dev:
-    image: rnwood/smtp4dev:v3
-    ports:
-      - "${SMTP4DEV_WEB_PORT:-8013}:80"
-      - "${SMTP4DEV_SMTP_PORT:-25}:25"
-      - "${SMTP4DEV_IMAP_PORT:-1143}:143"
-    volumes:
-      - smtp4dev_data:/smtp4dev
 
   memcached:
     image: arm64v8/memcached:1
