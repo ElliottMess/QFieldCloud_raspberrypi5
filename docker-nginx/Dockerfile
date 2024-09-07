@@ -1,4 +1,5 @@
-FROM nginx:stable
+ARG ARCH=arm64v8
+FROM ${ARCH}/nginx:stable
 
 COPY pages /var/www/html/pages/
 COPY templates/ /etc/nginx/templates/

@@ -1,11 +1,22 @@
-# NOTE if the ubuntu version is changed, also change it in `Suites:` in apt sources, and in `QGIS_VERSION`
-FROM ubuntu:noble
+ARG ARCH=arm64v8
+FROM ${ARCH}/ubuntu:noble
 
-# Install dependencies needed to add QGIS repository
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y gnupg software-properties-common wget
+# Install dependencies
+RUN apt update && apt upgrade -y && apt install -y \
+    gnupg software-properties-common wget \
+    python3-pip xvfb iputils-ping glibc-tools git \
+    build-essential cmake libqt5core5a libqt5gui5 libqt5network5 \
+    libqt5widgets5 libqt5xml5 libgdal-dev libgeos-dev libproj-dev \
+    libspatialite-dev libspatialindex-dev libsqlite3-dev
 
+# Build QGIS from source (this may take a while)
+RUN git clone https://github.com/qgis/QGIS.git /tmp/QGIS \
+    && cd /tmp/QGIS \
+    && mkdir build && cd build \
+    && cmake .. \
+    && make -j$(nproc) \
+    && make install
+    
 # Add QGIS GPG key
 RUN wget -O /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg
 

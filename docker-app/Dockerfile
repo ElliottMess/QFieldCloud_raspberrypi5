@@ -1,9 +1,13 @@
+
+ARG ARCH=arm64v8
+
 ##########################
 # BUILDER                #
 ##########################
 
 # pull a builder image, the same as the base
-FROM python:3.10.8-slim-buster as build
+
+FROM ${ARCH}/python:3.10-slim-bullseye as build
 
 # Disable annoying pip version check, we don't care if pip is slightly older
 ARG PIP_DISABLE_PIP_VERSION_CHECK 1
@@ -29,7 +33,7 @@ RUN ls -Q /usr/local/lib/python3.10/site-packages/botocore/data | grep -xv "endp
 ##########################
 
 # pull official base image
-FROM python:3.10.8-slim-buster as base
+FROM ${ARCH}/python:3.10-slim-bullseye as base
 
 # set work directory
 WORKDIR /usr/src/app

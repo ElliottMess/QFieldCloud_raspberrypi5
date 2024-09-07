@@ -13,6 +13,8 @@ services:
       context: ./docker-app
       target: webserver_runtime
       network: host
+      args:
+        ARCH: arm64v8
     restart: unless-stopped
     command: >
       gunicorn
@@ -90,6 +92,8 @@ services:
   nginx:
     build:
       context: ./docker-nginx
+      args:
+        ARCH: arm64v8
     restart: unless-stopped
     volumes:
       - ./conf/certbot/conf:/etc/letsencrypt:ro
@@ -119,7 +123,7 @@ services:
 
   # Automatically create self-signed certificates for local development and test deployments
   mkcert:
-    image: vishnunair/docker-mkcert
+    image: arm64v8/alpine
     environment:
       domain: ${QFIELDCLOUD_HOST}
     volumes:
@@ -127,7 +131,7 @@ services:
     command: /bin/sh -c 'mkcert -install && for i in $$(echo $$domain | sed "s/,/ /g"); do [ ! -f /root/.local/share/mkcert/$$i.pem ] && mkcert $$i; done && tail -f -n0 /etc/hosts'
 
   certbot:
-    image: certbot/certbot
+    image: certbot/certbot:arm64v8
     restart: unless-stopped
     volumes:
       - ./conf/certbot/conf:/etc/letsencrypt
@@ -140,6 +144,7 @@ services:
       network: host
       args:
         DEBUG_BUILD: ${DEBUG}
+        ARCH: arm64v8
     tty: true
     command: bash -c "echo QGIS built"
     logging: *default-logging
@@ -151,6 +156,8 @@ services:
       context: ./docker-app
       network: host
       target: worker_wrapper_runtime
+      args:
+        ARCH: arm64v8
     command: python manage.py dequeue
     user: root # TODO change me to least privileged docker-capable user on the host (/!\ docker users!=hosts users, use UID rather than username)
     volumes:
@@ -166,7 +173,7 @@ services:
     stop_grace_period: 15m
 
   ofelia:
-    image: mcuadros/ofelia:v0.3.4
+    image: mcuadros/ofelia:v0.3.4-arm64v8
     restart: unless-stopped
     depends_on:
       - app
@@ -175,7 +182,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   mirror_transformation_grids:
-    image: k3rnelpan1c/alpine-wget:latest
+    image: arm64v8/alpine
     command: |
       wget --mirror https://cdn.proj.org/ -P /transformation_grids --no-host-directories
       chmod a+r /transformation_grids/*
@@ -183,7 +190,7 @@ services:
       - transformation_grids:/transformation_grids
 
   memcached:
-    image: memcached:1
+    image: arm64v8/memcached:1
     expose:
       - "11211:11211"
 
