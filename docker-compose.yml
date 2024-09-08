@@ -119,7 +119,8 @@ services:
       ofelia.job-exec.runcrons.command: python manage.py runcrons
     ports:
       - "${DJANGO_DEV_PORT:-8020}:8000"
-
+      - "${DEBUG_DEBUGPY_APP_PORT:-5679}:5678"
+      
   nginx:
     build:
       context: ./docker-nginx
