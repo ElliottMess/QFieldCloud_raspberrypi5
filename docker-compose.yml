@@ -228,9 +228,9 @@ services:
 
   minio:
     ports:
-      - "${MINIO_API_PORT:-8009}:9000"
-      - "${MINIO_BROWSER_PORT:-8013}:9001"
-
+    - "${MINIO_API_PORT:-9000}:9000"
+    - "${MINIO_BROWSER_PORT:-9001}:9001"
+    
 volumes:
   geodb_data_new:
   static_volume:
