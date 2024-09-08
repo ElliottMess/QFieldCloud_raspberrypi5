@@ -117,6 +117,8 @@ services:
       ofelia.job-exec.runcrons.no-overlap: "true"
       ofelia.job-exec.runcrons.schedule: "@every 1m"
       ofelia.job-exec.runcrons.command: python manage.py runcrons
+    ports:
+      - "${DJANGO_DEV_PORT:-8020}:8000"
 
   nginx:
     build:
@@ -149,6 +151,8 @@ services:
         max-size: "1000m"
         max-file: "10"
         tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    depends_on:
+      - app
 
   # Automatically create self-signed certificates for local development and test deployments
   mkcert:
@@ -230,7 +234,7 @@ services:
     ports:
     - "${MINIO_API_PORT:-9000}:9000"
     - "${MINIO_BROWSER_PORT:-9001}:9001"
-    
+
 volumes:
   geodb_data_new:
   static_volume:
