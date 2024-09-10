@@ -232,9 +232,21 @@ services:
     image: arm64v8/memcached:1
 
   minio:
+    image: minio/minio:RELEASE.2023-04-07T05-28-58Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY_ID}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_ACCESS_KEY}
+    volumes:
+      - minio_data:/data
     ports:
-    - "${MINIO_API_PORT:-9000}:9000"
-    - "${MINIO_BROWSER_PORT:-9001}:9001"
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_BROWSER_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
 volumes:
   geodb_data_new:
@@ -244,3 +256,4 @@ volumes:
   certbot_www:
   postgres_data:
   smtp4dev_data:
+  minio_data:
