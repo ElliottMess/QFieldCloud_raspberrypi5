@@ -8,7 +8,7 @@ x-logging: &default-logging
 
 services:
   db:
-    image: arm64v8/postgres:13
+    image: postgis/postgis:13-3.1-arm64
     platform: linux/arm64/v8
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -16,8 +16,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh      
-
+      
   geodb:
     build:
       context: ./postgis
