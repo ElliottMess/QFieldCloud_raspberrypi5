@@ -172,12 +172,12 @@ WSGI_APPLICATION = "qfieldcloud.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": os.environ.get("POSTGRES_DB"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("POSTGRES_HOST"),
-        "PORT": os.environ.get("POSTGRES_PORT"),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', 'qfieldcloud_db'),
+        'USER': os.environ.get('POSTGRES_USER', 'qfieldcloud'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'your_password'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
         "OPTIONS": {"sslmode": os.environ.get("POSTGRES_SSLMODE")},
         "TEST": {
             "NAME": os.environ.get("POSTGRES_DB_TEST"),
