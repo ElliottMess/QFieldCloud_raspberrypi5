@@ -17,7 +17,7 @@ RUN pip install --upgrade setuptools
 
 # Install specific versions of numpy and GDAL
 RUN pip install --no-cache-dir numpy==1.23.5
-RUN pip install --no-cache-dir GDAL==$(gdal-config --version)
+RUN pip install --no-cache-dir GDAL==3.4.1
 
 # Disable annoying pip version check, we don't care if pip is slightly older
 ARG PIP_DISABLE_PIP_VERSION_CHECK 1
