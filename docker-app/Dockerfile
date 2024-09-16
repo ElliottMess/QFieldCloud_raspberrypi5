@@ -79,6 +79,17 @@ RUN echo '{}' > fixture.json
 COPY ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
+RUN apt-get update && apt-get install -y \
+    binutils libproj-dev gdal-bin \
+    gettext \
+    graphviz \
+    libgdal-dev \
+    python3-gdal
+
+# Set GDAL environment variables
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
 ##########################
 # WEBSERVER RUNTIME      #
 ##########################
@@ -109,6 +120,13 @@ COPY . .
 RUN chown -R app:app .
 USER app
 
+# Configure GDAL
+RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal
+RUN export C_INCLUDE_PATH=/usr/include/gdal
+RUN pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
+COPY ./requirements/requirements_runtime.txt requirements/requirements_runtime.txt
+RUN pip3 install -r requirements/requirements_runtime.txt
+
 ##########################
 # WORKER WRAPPER RUNTIME #
 ##########################
@@ -122,3 +140,11 @@ RUN pip3 install -r requirements/requirements_worker_wrapper.txt
 COPY . .
 RUN chown -R app:app .
 USER app
+
+
+# Configure GDAL
+RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal
+RUN export C_INCLUDE_PATH=/usr/include/gdal
+RUN pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
+COPY ./requirements/requirements_worker_wrapper.txt requirements/requirements_worker_wrapper.txt
+RUN pip3 install -r requirements/requirements_worker_wrapper.txt
