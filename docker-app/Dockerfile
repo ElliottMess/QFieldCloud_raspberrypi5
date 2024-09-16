@@ -9,6 +9,16 @@ ARG ARCH=arm64v8
 
 FROM ${ARCH}/python:3.10-slim-bullseye as build
 
+# Install system dependencies for GDAL
+RUN apt-get update && apt-get install -y gdal-bin libgdal-dev
+
+# Upgrade setuptools to ensure compatibility
+RUN pip install --upgrade setuptools
+
+# Install specific versions of numpy and GDAL
+RUN pip install --no-cache-dir numpy==1.23.5
+RUN pip install --no-cache-dir GDAL==$(gdal-config --version)
+
 # Disable annoying pip version check, we don't care if pip is slightly older
 ARG PIP_DISABLE_PIP_VERSION_CHECK 1
 
