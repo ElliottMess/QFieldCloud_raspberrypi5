@@ -1,4 +1,3 @@
-
 x-logging: &default-logging
   driver: "json-file"
   options:
@@ -254,6 +253,5 @@ volumes:
   media_volume:
   transformation_grids:
   certbot_www:
-  postgres_data:
   smtp4dev_data:
   minio_data:
