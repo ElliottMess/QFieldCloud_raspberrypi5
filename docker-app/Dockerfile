@@ -84,13 +84,16 @@ RUN apt-get update && apt-get install -y \
     gettext \
     graphviz \
     libgdal-dev \
-    gdal-bin \
     python3-gdal
 
 # Set GDAL environment variables
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 ENV GDAL_CONFIG=/usr/bin/gdal-config
+
+# Install GDAL Python bindings
+RUN pip install --no-cache-dir numpy==1.23.5 && \
+    pip install --no-cache-dir GDAL==$(gdal-config --version)
 
 ##########################
 # WEBSERVER RUNTIME      #
@@ -145,7 +148,6 @@ RUN pip3 install -r requirements/requirements_worker_wrapper.txt
 COPY . .
 RUN chown -R app:app .
 USER app
-
 
 # Configure GDAL
 RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal

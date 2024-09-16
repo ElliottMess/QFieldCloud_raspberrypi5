@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements/requirements_test.txt requirements/requirements_test.in
 #
+numpy==1.23.5
+
 attrs==24.2.0
     # via
     #   fiona
@@ -64,5 +66,3 @@ urllib3[socks]==1.26.20
     # via selenium
 wsproto==1.2.0
     # via trio-websocket
-
-GDAL==`gdal-config --version`
