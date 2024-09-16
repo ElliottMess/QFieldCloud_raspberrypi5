@@ -14,7 +14,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh      
   geodb:
     build:
@@ -248,6 +247,7 @@ services:
       retries: 3
 
 volumes:
+  postgres_data:
   geodb_data_new:
   static_volume:
   media_volume:
