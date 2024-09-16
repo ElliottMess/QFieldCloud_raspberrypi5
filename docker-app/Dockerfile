@@ -84,11 +84,13 @@ RUN apt-get update && apt-get install -y \
     gettext \
     graphviz \
     libgdal-dev \
+    gdal-bin \
     python3-gdal
 
 # Set GDAL environment variables
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
+ENV GDAL_CONFIG=/usr/bin/gdal-config
 
 ##########################
 # WEBSERVER RUNTIME      #
@@ -108,6 +110,9 @@ USER app
 ##########################
 # WEBSERVER TEST         #
 ##########################
+
+RUN export GDAL_VERSION=$(gdal-config --version) && \
+    pip install GDAL==${GDAL_VERSION}
 
 # a separate stage for webserver test environment
 FROM base as webserver_test

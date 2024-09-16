@@ -64,3 +64,5 @@ urllib3[socks]==1.26.20
     # via selenium
 wsproto==1.2.0
     # via trio-websocket
+
+GDAL==`gdal-config --version`

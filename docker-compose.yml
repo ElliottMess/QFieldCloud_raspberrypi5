@@ -193,6 +193,9 @@ services:
       args:
         ARCH: arm64v8
     command: python manage.py dequeue
+    environment:
+      GDAL_VERSION: ${GDAL_VERSION:-`gdal-config --version`}
+      GDAL_CONFIG: /usr/bin/gdal-config
     user: root # TODO change me to least privileged docker-capable user on the host (/!\ docker users!=hosts users, use UID rather than username)
     volumes:
       # TODO : how can we reuse static/media volumes from default-django to keep things DRY (yaml syntax expert needed)
