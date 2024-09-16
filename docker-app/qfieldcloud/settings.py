@@ -175,7 +175,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_DB', 'qfieldcloud_db'),
         'USER': os.environ.get('POSTGRES_USER', 'qfieldcloud'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'your_password'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'Slashed9-Symptom2-Bagged0'),
         'HOST': os.environ.get('POSTGRES_HOST', 'db'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
         "OPTIONS": {"sslmode": os.environ.get("POSTGRES_SSLMODE")},
