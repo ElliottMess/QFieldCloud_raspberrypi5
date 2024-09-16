@@ -9,11 +9,14 @@ ARG ARCH=arm64v8
 
 FROM ${ARCH}/python:3.10-slim-bullseye as build
 
-# Install system dependencies for GDAL
-RUN apt-get update && apt-get install -y gdal-bin libgdal-dev
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:ubuntugis/ppa && \
+    apt-get update && \
+    apt-get install -y gdal-bin=3.9.2* libgdal-dev=3.9.2*
 
-# Upgrade setuptools to ensure compatibility
-RUN pip install --upgrade setuptools
+# Upgrade setuptools and pip
+RUN pip install --upgrade pip setuptools
 
 # Install specific versions of numpy and GDAL
 RUN pip install --no-cache-dir numpy==1.23.5
