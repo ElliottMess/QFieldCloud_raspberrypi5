@@ -13,8 +13,8 @@ RUN apt-get update && \
     apt-get install -y software-properties-common gnupg && \
     add-apt-repository ppa:ubuntugis/ppa && \
     apt-get update && \
-    apt-get install -y gdal-bin=3.9.2* libgdal-dev=3.9.2*
-        
+    apt-get install libgdal-dev gdal-bin
+
 # Upgrade setuptools and pip
 RUN pip install --upgrade pip setuptools
 
