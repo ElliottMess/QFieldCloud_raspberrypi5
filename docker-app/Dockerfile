@@ -7,14 +7,14 @@ ARG ARCH=arm64v8
 
 # pull a builder image, the same as the base
 
-FROM ${ARCH}/python:3.10-slim-bullseye as build
+FROM arm64v8/ubuntu:22.04
 
 RUN apt-get update && \
     apt-get install -y software-properties-common gnupg && \
     add-apt-repository ppa:ubuntugis/ppa && \
     apt-get update && \
     apt-get install -y gdal-bin=3.9.2* libgdal-dev=3.9.2*
-    
+        
 # Upgrade setuptools and pip
 RUN pip install --upgrade pip setuptools
 
