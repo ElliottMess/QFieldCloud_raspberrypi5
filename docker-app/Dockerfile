@@ -1,108 +1,95 @@
-
 ARG ARCH=arm64v8
 
 ##########################
 # BUILDER                #
 ##########################
 
-# pull a builder image, the same as the base
-
+# Name the build stage 'build'
 FROM arm64v8/ubuntu:22.04 AS build
 
+# Install necessary packages
 RUN apt-get update && \
-    apt-get install -y software-properties-common gnupg && \
-    add-apt-repository ppa:ubuntugis/ppa && \
-    apt-get update && \
-    apt-get install libgdal-dev gdal-bin
+    apt-get install -y software-properties-common gnupg
+
+# Remove the PPA addition since it may not support arm64
+# RUN add-apt-repository ppa:ubuntugis/ppa && \
+#     apt-get update
+
+# Install GDAL and dependencies
+RUN apt-get install -y libgdal-dev gdal-bin
 
 # Upgrade setuptools and pip
-RUN pip install --upgrade pip setuptools
+RUN apt-get install -y python3-pip && \
+    pip3 install --upgrade pip setuptools
 
 # Install specific versions of numpy and GDAL
-RUN pip install --no-cache-dir numpy==1.23.5
-RUN pip install --no-cache-dir GDAL==3.9.2
+RUN pip3 install --no-cache-dir numpy==1.23.5
+RUN pip3 install --no-cache-dir GDAL==$(gdal-config --version)
 
-# Disable annoying pip version check, we don't care if pip is slightly older
-ARG PIP_DISABLE_PIP_VERSION_CHECK 1
+# Disable annoying pip version check
+ARG PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Do not create and use redundant cache dir in the current user home
-ARG PIP_NO_CACHE_DIR 1
+ARG PIP_NO_CACHE_DIR=1
 
-# install psycopg2 requirements
-RUN apt update && apt install -y libpq-dev python3-dev gcc
+# Install psycopg2 requirements
+RUN apt-get install -y libpq-dev python3-dev gcc
 
-# install `pip-compile` (as part of `pip-tools`)
-RUN pip install pip-tools
+# Install `pip-compile` (as part of `pip-tools`)
+RUN pip3 install pip-tools
 
-# install pip dependencies
+# Install pip dependencies
 COPY ./requirements/requirements.txt /requirements/requirements.txt
-RUN pip3 install -r requirements/requirements.txt
+RUN pip3 install -r /requirements/requirements.txt
 
-# save 60 MB of data... Safe to delete according to botocore contributor https://github.com/boto/botocore/issues/1629#issuecomment-451309885
-RUN ls -Q /usr/local/lib/python3.10/site-packages/botocore/data | grep -xv "endpoints.json" | xargs rm -rf
+# Save space by removing unnecessary files
+RUN find /usr/local/lib/python3.10/site-packages/botocore/data -type f ! -name "endpoints.json" -delete
 
 ##########################
 # BASE                   #
 ##########################
 
-# pull official base image
 FROM ${ARCH}/python:3.10-slim-bullseye as base
 
-# set work directory
+# Set work directory
 WORKDIR /usr/src/app
 
-# set environment variables
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-# check `build` stage for more info
-# NOTE while using ARG would be more appropriate, the following vars would have to be redifined for each build stage.
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
-ENV PIP_NO_CACHE_DIR 1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
 
-# install dependencies
-RUN apt update && apt-get install -y \
-# GeoDjango as recommended at https://docs.djangoproject.com/en/4.1/ref/contrib/gis/install/geolibs/#installing-geospatial-libraries
-    binutils libproj-dev gdal-bin \
-# needed for Django's `manage.py makemessages`
-    gettext \
-# for development purposes only (optional dependency for `django-extensions`)
-    graphviz
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    binutils libproj-dev gdal-bin gettext graphviz
 
-# copy the dependencies
+# Copy the dependencies from the build stage
 COPY --from=build /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 
-# install debug dependencies
+# Install debug dependencies if needed
 ARG DEBUG_BUILD
 RUN if [ "$DEBUG_BUILD" = "1" ]; then pip3 install debugpy ipython; fi
 
-# add app group
+# Add app user
 RUN addgroup --system app && adduser --system app --ingroup app
 
-# create the appropriate directories
-RUN mkdir staticfiles
-RUN mkdir mediafiles
+# Create directories
+RUN mkdir staticfiles mediafiles
 
-# create an empty JSON fixture for the sole purpose of Django's testserver
+# Create an empty JSON fixture
 RUN echo '{}' > fixture.json
-
-# Do not uncomment unless you want to share the user id between the host and the container
-# RUN groupmod -g 1000 app
-# RUN usermod -u 1000 app
 
 COPY ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-
-RUN apt-get update && apt-get install -y \
-    binutils libproj-dev gdal-bin \
-    gettext \
-    graphviz \
-    libgdal-dev \
-    python3-gdal
 
 # Set GDAL environment variables
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 ENV GDAL_CONFIG=/usr/bin/gdal-config
+
+# Copy the rest of your Dockerfile as is...
+# (Ensure you include the rest of your stages and commands)
 
 # Install GDAL Python bindings
 RUN pip install --no-cache-dir numpy==1.23.5 && \
