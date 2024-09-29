@@ -64,6 +64,9 @@ ENV PIP_NO_CACHE_DIR=1
 RUN apt-get update && apt-get install -y \
     binutils libproj-dev gdal-bin gettext graphviz
 
+# **Add this command to upgrade pip and setuptools**
+RUN pip install --upgrade pip setuptools
+
 # Copy the dependencies from the build stage
 COPY --from=build /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 
