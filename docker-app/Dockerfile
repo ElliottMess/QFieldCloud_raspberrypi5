@@ -7,7 +7,7 @@ ARG ARCH=arm64v8
 
 # pull a builder image, the same as the base
 
-FROM arm64v8/ubuntu:22.04
+FROM arm64v8/ubuntu:22.04 AS build
 
 RUN apt-get update && \
     apt-get install -y software-properties-common gnupg && \
