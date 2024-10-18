@@ -86,7 +86,7 @@ RUN groupadd -r app && useradd -r -g app app
 
 # Copy and install dependencies
 COPY ./requirements/requirements_worker_wrapper.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --upgrade setuptools && SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
 
 # Copy application files
 COPY . .
