@@ -101,3 +101,34 @@ USER app
 RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
     export C_INCLUDE_PATH=/usr/include/gdal && \
     pip install GDAL==${GDAL_VERSION}
+
+##########################
+# WEBSERVER RUNTIME      #
+##########################
+
+FROM base as webserver_runtime
+
+# Set environment variable for GDAL
+ARG GDAL_VERSION=3.4.1
+ENV GDAL_VERSION=${GDAL_VERSION}
+
+# Create the user and group
+RUN groupadd -r app && useradd -r -g app app
+
+# Copy and install dependencies
+COPY ./requirements/requirements_webserver.txt requirements.txt
+RUN pip install -r requirements.txt
+
+# Copy application files
+COPY . .
+
+# Set ownership
+RUN chown -R app:app .
+
+# Switch to the app user
+USER app
+
+# Configure GDAL environment
+RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
+    export C_INCLUDE_PATH=/usr/include/gdal && \
+    pip install GDAL==${GDAL_VERSION}
