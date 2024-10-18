@@ -98,9 +98,10 @@ RUN chown -R app:app .
 USER app
 
 # Configure GDAL environment
-RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
+RUN apt-get update && apt-get install -y gdal-bin && \
+    export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
     export C_INCLUDE_PATH=/usr/include/gdal && \
-    pip install GDAL==${GDAL_VERSION} --global-option=build_ext --global-option="-I/usr/include/gdal"
+    pip install GDAL==${GDAL_VERSION}
 
 ##########################
 # WEBSERVER RUNTIME      #
@@ -129,6 +130,7 @@ RUN chown -R app:app .
 USER app
 
 # Configure GDAL environment
-RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
+RUN apt-get update && apt-get install -y gdal-bin && \
+    export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
     export C_INCLUDE_PATH=/usr/include/gdal && \
-    pip install GDAL==${GDAL_VERSION} --global-option=build_ext --global-option="-I/usr/include/gdal"
+    pip install GDAL==${GDAL_VERSION}
