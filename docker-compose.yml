@@ -222,7 +222,7 @@ services:
   mirror_transformation_grids:
     image: arm64v8/alpine:latest
     command: |
-      RUN apt-get update && apt-get install -y wget
+      wget -P /transformation_grids --no-host-directories
       chmod a+r /transformation_grids/*
     volumes:
       - transformation_grids:/transformation_grids
