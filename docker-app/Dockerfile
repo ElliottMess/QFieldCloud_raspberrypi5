@@ -86,7 +86,7 @@ RUN groupadd -r app && useradd -r -g app app
 
 # Copy and install dependencies
 COPY ./requirements/requirements_worker_wrapper.txt requirements.txt
-RUN pip install --upgrade setuptools && SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
+RUN apt-get update && apt-get install -y gdal-bin && pip install --upgrade setuptools && SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
 
 # Copy application files
 COPY . .
@@ -96,12 +96,6 @@ RUN chown -R app:app .
 
 # Switch to the app user
 USER app
-
-# Configure GDAL environment
-RUN apt-get update && apt-get install -y gdal-bin && \
-    export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
-    export C_INCLUDE_PATH=/usr/include/gdal && \
-    pip install GDAL==${GDAL_VERSION}
 
 ##########################
 # WEBSERVER RUNTIME      #
@@ -128,9 +122,3 @@ RUN chown -R app:app .
 
 # Switch to the app user
 USER app
-
-# Configure GDAL environment
-RUN apt-get update && apt-get install -y gdal-bin && \
-    export CPLUS_INCLUDE_PATH=/usr/include/gdal && \
-    export C_INCLUDE_PATH=/usr/include/gdal && \
-    pip install GDAL==${GDAL_VERSION}
