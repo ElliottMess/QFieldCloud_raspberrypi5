@@ -113,6 +113,7 @@ RUN groupadd -r app && useradd -r -g app app
 # Copy and install dependencies
 COPY ./requirements/requirements.txt requirements.txt
 RUN SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
+RUN pip install debugpy
 
 # Copy application files
 COPY . .
