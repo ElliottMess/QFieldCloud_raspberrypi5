@@ -21,8 +21,8 @@ RUN apt-get install -y libgdal-dev gdal-bin
 # Upgrade setuptools and pip
 RUN apt-get install -y python3-pip && \
     pip3 install --upgrade pip setuptools
-RUN pip install --upgrade setuptools
 
+RUN pip uninstall -y setuptools && pip install setuptools
 # Install specific versions of numpy and GDAL
 RUN pip3 install --no-cache-dir numpy==1.23.5
 RUN pip3 install --no-cache-dir GDAL==$(gdal-config --version)
