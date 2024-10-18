@@ -44,7 +44,7 @@ COPY ./requirements/requirements.txt /requirements/requirements.txt
 RUN pip3 install -r /requirements/requirements.txt
 
 # Save space by removing unnecessary files
-RUN find /usr/local/lib/python3.10/site-packages/botocore/data -type f ! -name "endpoints.json" -delete
+RUN [ -d /usr/local/lib/python3.10/site-packages/botocore/data ] && find /usr/local/lib/python3.10/site-packages/botocore/data -type f ! -name "endpoints.json" -delete || echo "Directory does not exist, skipping deletion"
 
 ##########################
 # BASE                   #
