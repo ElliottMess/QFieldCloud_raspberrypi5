@@ -126,6 +126,7 @@ services:
         ARCH: arm64v8
     restart: unless-stopped
     volumes:
+      - ./certs:/etc/nginx/certs
       - ./conf/certbot/conf:/etc/letsencrypt:ro
       - ./conf/nginx/certs/:/etc/nginx/certs/:ro
       - ./conf/nginx/config.d:/etc/nginx/config.d/:ro
@@ -151,8 +152,10 @@ services:
         max-file: "10"
         tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
     depends_on:
-      - app
-
+      app:
+        depends_on:
+          - db
+          - geodb
   # Automatically create self-signed certificates for local development and test deployments
   mkcert:
     build:
@@ -224,7 +227,7 @@ services:
   mirror_transformation_grids:
     image: arm64v8/alpine:latest
     command: |
-      wget --mirror https://cdn.proj.org/ -P /transformation_grids --no-host-directories
+      RUN apt-get update && apt-get install -y wget
       chmod a+r /transformation_grids/*
     volumes:
       - transformation_grids:/transformation_grids

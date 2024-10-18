@@ -23,6 +23,7 @@ RUN apt-get install -y python3-pip && \
     pip3 install --upgrade pip setuptools
 
 RUN pip uninstall -y setuptools && pip install setuptools
+RUN pip install debugpy
 
 # Install specific versions of numpy and GDAL
 RUN pip3 install --no-cache-dir numpy==1.23.5
@@ -113,7 +114,6 @@ RUN groupadd -r app && useradd -r -g app app
 # Copy and install dependencies
 COPY ./requirements/requirements.txt requirements.txt
 RUN SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
-RUN pip install debugpy
 
 # Copy application files
 COPY . .
