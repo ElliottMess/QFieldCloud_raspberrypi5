@@ -116,7 +116,7 @@ ENV GDAL_VERSION=${GDAL_VERSION}
 RUN groupadd -r app && useradd -r -g app app
 
 # Copy and install dependencies
-COPY ./requirements/requirements_webserver.txt requirements.txt
+COPY ./requirements/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy application files
