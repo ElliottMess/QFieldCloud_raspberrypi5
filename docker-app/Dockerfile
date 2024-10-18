@@ -111,6 +111,7 @@ RUN pip3 install -r requirements/requirements_runtime.txt
 EXPOSE 8000
 
 COPY . .
+RUN groupadd -r app && useradd -r -g app app
 RUN chown -R app:app .
 USER app
 
@@ -129,6 +130,7 @@ RUN pip3 install -r requirements/requirements_test.txt
 EXPOSE 8000
 
 COPY . .
+RUN groupadd -r app && useradd -r -g app app
 RUN chown -R app:app .
 USER app
 
@@ -153,17 +155,26 @@ ENV PYTHONUNBUFFERED 1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_NO_CACHE_DIR=1
 
-# Install required system packages
+# Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     binutils libproj-dev gdal-bin gettext libpq-dev python3-dev gcc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Upgrade pip and setuptools, and install requirements
 COPY ./requirements/requirements_worker_wrapper.txt requirements.txt
 RUN pip install --upgrade pip setuptools && pip install -r requirements.txt
+
+# Create the user and group
+RUN groupadd -r app && useradd -r -g app app
+
+# Copy the project files
 COPY . .
+
+# Set ownership of the files to the app user
 RUN chown -R app:app .
+
+# Switch to the app user
 USER app
 
 # Configure GDAL
