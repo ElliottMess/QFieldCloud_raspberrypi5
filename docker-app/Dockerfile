@@ -144,11 +144,24 @@ RUN pip3 install -r requirements/requirements_runtime.txt
 ##########################
 
 # a separate stage for worker wrapper runtime environment
-FROM base as worker_wrapper_runtime
-ENV LOGGER_SOURCE=worker_wrapper
-COPY ./requirements/requirements_worker_wrapper.txt requirements/requirements_worker_wrapper.txt
-RUN pip3 install -r requirements/requirements_worker_wrapper.txt
+FROM arm64v8/python:3.10-slim-bullseye as worker_wrapper_runtime
+WORKDIR /usr/src/app
 
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
+
+# Install required system packages
+RUN apt-get update && apt-get install -y \
+    binutils libproj-dev gdal-bin gettext libpq-dev python3-dev gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY ./requirements/requirements_worker_wrapper.txt requirements.txt
+RUN pip install --upgrade pip setuptools && pip install -r requirements.txt
 COPY . .
 RUN chown -R app:app .
 USER app
