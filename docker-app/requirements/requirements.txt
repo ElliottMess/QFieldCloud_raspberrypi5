@@ -225,3 +225,4 @@ wrapt==1.15.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+setuptools>=58.0.0
