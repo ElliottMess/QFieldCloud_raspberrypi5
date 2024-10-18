@@ -151,11 +151,6 @@ services:
         max-size: "1000m"
         max-file: "10"
         tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
-    depends_on:
-      app:
-        depends_on:
-          - db
-          - geodb
   # Automatically create self-signed certificates for local development and test deployments
   mkcert:
     build:
